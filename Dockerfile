@@ -13,13 +13,19 @@ WORKDIR     /build
 
 # Versions: v3.2.6
 ARG         LOGSPOUT_VERSION=591787f3d3202cbe029a9cff6c14e3a178e1f78c
+ARG         GLIDE_VERSION=8ed5b9292379d86c39592a7e6a58eb9c903877cf
 ARG         TARGETPLATFORM
 
 # Checkout logspout upstream, install glide and run it
 WORKDIR     /go/src/github.com/gliderlabs/logspout
 RUN         git clone https://github.com/gliderlabs/logspout.git .
 RUN         git checkout $LOGSPOUT_VERSION
-RUN         go get github.com/Masterminds/glide
+
+# Install glide
+RUN         mkdir -p $GOPATH/src/github.com/Masterminds
+RUN         git -C $GOPATH/src/github.com/Masterminds clone git://github.com/Masterminds/glide
+RUN         git -C $GOPATH/src/github.com/Masterminds/glide checkout $GLIDE_VERSION
+RUN         cd $GOPATH/src/github.com/Masterminds/glide && go install .
 RUN         $GOPATH/bin/glide install
 
 # Add the logdna stuff
