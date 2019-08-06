@@ -3,12 +3,11 @@
 ##########################
 FROM        --platform=$BUILDPLATFORM golang:1.13-rc-buster                                               AS builder
 
-MAINTAINER  dubo-dubon-duponey@jsboot.space
 # Install dependencies and tools
 ARG         DEBIAN_FRONTEND="noninteractive"
 ENV         TERM="xterm" LANG="C.UTF-8" LC_ALL="C.UTF-8"
 RUN         apt-get update                                                                                > /dev/null
-RUN         apt-get install -y git                                                                        > /dev/null
+RUN         apt-get install -y --no-install-recommends git=1:2.20.1-2                                     > /dev/null
 WORKDIR     /build
 
 # Versions: v3.2.6
@@ -22,11 +21,11 @@ RUN         git clone https://github.com/gliderlabs/logspout.git .
 RUN         git checkout $LOGSPOUT_VERSION
 
 # Install glide
-RUN         mkdir -p $GOPATH/src/github.com/Masterminds
-RUN         git -C $GOPATH/src/github.com/Masterminds clone git://github.com/Masterminds/glide
-RUN         git -C $GOPATH/src/github.com/Masterminds/glide checkout $GLIDE_VERSION
-RUN         cd $GOPATH/src/github.com/Masterminds/glide && go install .
-RUN         $GOPATH/bin/glide install
+RUN         mkdir -p "$GOPATH"/src/github.com/Masterminds
+RUN         git -C "$GOPATH"/src/github.com/Masterminds clone git://github.com/Masterminds/glide
+RUN         git -C "$GOPATH"/src/github.com/Masterminds/glide checkout "$GLIDE_VERSION"
+RUN         go install "$GOPATH"/src/github.com/Masterminds/glide
+RUN         "$GOPATH"/bin/glide install
 
 # Add the logdna stuff
 COPY        modules.go .
@@ -41,11 +40,11 @@ RUN         arch=${TARGETPLATFORM#*/} && \
 #######################
 FROM        debian:buster-slim
 
-MAINTAINER  dubo-dubon-duponey@jsboot.space
+LABEL       dockerfile.copyright="Dubo Dubon Duponey <dubo-dubon-duponey@jsboot.space>"
+
 ARG         DEBIAN_FRONTEND="noninteractive"
 ENV         TERM="xterm" LANG="C.UTF-8" LC_ALL="C.UTF-8"
 RUN         apt-get update              > /dev/null && \
-            apt-get dist-upgrade -y                 && \
             apt-get -y autoremove       > /dev/null && \
             apt-get -y clean            && \
             rm -rf /var/lib/apt/lists/* && \
