@@ -1,7 +1,7 @@
 ##########################
 # Building image
 ##########################
-FROM        --platform=$BUILDPLATFORM golang:1.13-rc-buster                                               AS builder
+FROM        --platform=$BUILDPLATFORM golang:1.13-buster                                                  AS builder
 
 # Install dependencies and tools
 ARG         DEBIAN_FRONTEND="noninteractive"
